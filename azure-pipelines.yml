@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Remplace par le nom de ton app service
+  webAppName: 'nom-de-ton-app-static-web'
+  # Le dossier de sortie de ton build (ex : 'dist', 'build', ou '/' si y'en a pas)
+  outputPath: 'build'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'Install and build project'
+
+- task: AzureStaticWebApp@0
+  inputs:
+    app_location: '/'               # Racine de ton app (ex: "/" ou "app")
+    output_location: '$(outputPath)' # Où se trouve le build généré (ex: "build", "dist", etc.)
+    azure_static_web_apps_api_token: $(deployment_token) # Secret à ajouter dans Azure DevOps
+  displayName: 'Deploy to Azure Static Web App'
